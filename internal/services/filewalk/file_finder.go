@@ -34,8 +34,8 @@ func isMatchExclude(path string, excludePatterns []*regexp.Regexp) bool {
 
 func FileFinder(dir string, exclude []string, extensions []string, keywords []string) ([]string, error) {
 	var result []string
-
 	extensionSet := make(map[string]struct{}, len(extensions))
+
 	for _, ext := range extensions {
 		extensionSet[ext] = struct{}{}
 	}
@@ -46,6 +46,7 @@ func FileFinder(dir string, exclude []string, extensions []string, keywords []st
 	}
 
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+
 		if err != nil {
 			return fmt.Errorf("error walking the path %q: %v", path, err)
 		}
@@ -54,18 +55,25 @@ func FileFinder(dir string, exclude []string, extensions []string, keywords []st
 			return nil
 		}
 
-		ext := filepath.Ext(path)
-		if _, match := extensionSet[ext]; match {
-			result = append(result, path)
-			return nil
-		}
-
+		foundKeywords := false
 		for _, keyword := range keywords {
 			if strings.Contains(path, keyword) {
-				result = append(result, path)
+				foundKeywords = true
 				break
 			}
 		}
+
+		if len(keywords) > 0 && !foundKeywords {
+			return nil
+		}
+
+		ext := filepath.Ext(path)
+		if _, match := extensionSet[ext]; !match && len(extensions) > 0 {
+			return nil
+		}
+
+		result = append(result, path)
+
 		return nil
 	})
 
