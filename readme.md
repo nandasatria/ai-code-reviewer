@@ -1,4 +1,4 @@
-Sure, here's an improved version of your `readme.md` documentation:
+improve this MD
 
 # AI Code Reviewer
 
@@ -29,11 +29,14 @@ go mod tidy
 
 To compile your Go program, run:
 
-- **For Windows:** 
+- **For Windows:**
+
   ```sh
   go build -o code-reviewer.exe
   ```
-- **For Mac/Linux:** 
+
+- **For Mac/Linux:**
+
   ```sh
   go build -o code-reviewer
   ```
@@ -41,12 +44,6 @@ To compile your Go program, run:
 #### 1.3 Optional: Add Binary to PATH
 
 You can add the path of the binary to your `PATH` environment variable for easier access.
-
-## Features
-
-### Version 0.1
-
-- Supported AI Generator: Azure OpenAI
 
 ## Usage
 
@@ -58,7 +55,7 @@ Usage: code-reviewer [options]
 Options:
   -scandir string
         Directory to scan (default ".")
-  -exclude string
+  -excludes string
         Comma-separated list of directories, files, extensions, or regex patterns to exclude
   -extensions string
         Comma-separated list of extensions used
@@ -66,16 +63,26 @@ Options:
         Comma-separated list of keywords to filter files
 ```
 
-## Example
+## Ouput
+
+The output in 3 format: `.md, .html, .pdf`
+
+## Example Usage
 
 To scan the current directory and exclude certain files or directories, you can use:
 
 ```sh
-./code-reviewer -scandir . -exclude "dir1,file1.go,*.tmp" -extensions ".go,.py" -keywords "TODO,FIXME"
+./code-reviewer -scandir . -exclude "dir1,file1.go,*.tmp" -extensions ".go,.py" -keywords "src"
 ```
 
-This will scan the current directory, excluding `dir1`, `file1.go`, and any `.tmp` files, looking for files with `.go` or `.py` extensions that contain the keywords `TODO` or `FIXME`.
+This will scan the current directory, excluding `dir1`, `file1.go`, and any `.tmp` files, looking for files with `.go` or `.py` extensions that contain the keywords `src`
 
----
+### Notes
 
-Feel free to reach out if you have any questions or need further assistance!
+- The Param is not mandatory, but for efficency use extentions filter or keyword filter and do not forget to use exclude to avoid scan all directory
+
+## Features
+
+### Version 0.1
+
+- Supported LLM : Azure OpenAI
