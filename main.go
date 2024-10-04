@@ -2,6 +2,7 @@ package main
 
 import (
 	"code-reviewer/internal/services/filewalk"
+	"code-reviewer/internal/services/reviewer"
 	"flag"
 	"fmt"
 	"log"
@@ -55,5 +56,5 @@ func main() {
 	fmt.Printf("Found files:\n%s\n\n", strings.Join(filepaths, "\n"))
 	fmt.Printf("Total number of files found: %d\n\n", len(filepaths))
 	fmt.Println("Starting Review Code")
-	// reviewer.Review(filepaths)
+	reviewer.Review(filepaths)
 }
