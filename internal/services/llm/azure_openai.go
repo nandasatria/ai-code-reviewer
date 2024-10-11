@@ -16,19 +16,9 @@ var (
 	key        string
 	model      string
 	apiVersion string
+	endpoint2  string
+	key2       string
 )
-
-func sampleUse() {
-	var messages []openai.ChatCompletionMessageParamUnion
-	messages = append(messages, openai.UserMessage("Hello"))
-
-	response, err := Chat(messages)
-	if err != nil {
-		log.Fatalf("Error while chat: %v\n", err)
-		return
-	}
-	fmt.Println(response)
-}
 
 func init() {
 	err := godotenv.Load()
@@ -42,15 +32,42 @@ func init() {
 	model = os.Getenv("AZURE_OPENAI_MODEL")
 	apiVersion = os.Getenv("AZURE_OPENAI_API_VERSION")
 
+	endpoint2 = os.Getenv("AZURE_OPENAI_ENDPOINT2")
+	key2 = os.Getenv("AZURE_OPENAI_KEY2")
+
 	if endpoint == "" || key == "" || model == "" || apiVersion == "" {
 		log.Fatalf("Environment variables are not set properly.")
 	}
 }
 
-func Chat(messages []openai.ChatCompletionMessageParamUnion) (string, error) {
+func ChatMPN1(messages []openai.ChatCompletionMessageParamUnion) (string, error) {
+	log.Printf("Start Running with endpoint: %s\n", endpoint)
+	res, err := Chat(messages, endpoint, key)
+	if err != nil {
+		log.Panicf("Error from endpoint: %s", endpoint)
+	} else {
+		log.Printf("Success Get Request from endpoint : %s", endpoint)
+	}
+
+	return res, err
+}
+
+func ChatMPN2(messages []openai.ChatCompletionMessageParamUnion) (string, error) {
+	log.Printf("Start Running with endpoint: %s\n", endpoint2)
+
+	res, err := Chat(messages, endpoint2, key2)
+	if err != nil {
+		log.Panicf("Error from endpoint: %s", endpoint)
+	} else {
+		log.Printf("Success Get Request from endpoint : %s", endpoint)
+	}
+	return res, err
+}
+
+func Chat(messages []openai.ChatCompletionMessageParamUnion, endpointlocal string, keylocal string) (string, error) {
 	client := openai.NewClient(
-		azure.WithEndpoint(endpoint, apiVersion),
-		azure.WithAPIKey(key),
+		azure.WithEndpoint(endpointlocal, apiVersion),
+		azure.WithAPIKey(keylocal),
 	)
 
 	ctx := context.Background()

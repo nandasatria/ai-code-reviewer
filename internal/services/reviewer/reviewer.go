@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"sync"
 
 	"github.com/gomarkdown/markdown"
 	"github.com/gomarkdown/markdown/html"
@@ -141,12 +142,10 @@ IF you the script is good, you can skip it, put #NA only for response
 
 			messages = append(messages, openai.UserMessage(stringContent))
 			tempresult := "##" + strconv.Itoa(index+1) + " File: " + path
-			res, err := llm.Chat(messages)
+			res, err := runChat(messages)
 			if err != nil {
-				log.Printf("Error when getting review from LLM for file %s: %v", path, err)
-				return
+				log.Printf("Error while running chat concurent %v", err)
 			}
-
 			tempresult += "\n\n" + res
 			results = append(results, tempresult)
 
@@ -163,6 +162,72 @@ IF you the script is good, you can skip it, put #NA only for response
 	// convertMDtoPDF(mdfilename, "code_review.pdf")
 	convertMDtoHTML(mdfilename, "code_review.html")
 
+}
+
+func runChat(messages []openai.ChatCompletionMessageParamUnion) (string, error) {
+	var wg sync.WaitGroup
+	wg.Add(2)
+
+	// Channels to receive results and errors from the goroutines
+	resChan := make(chan string, 2)
+	errChan := make(chan error, 2)
+
+	// Run llm.ChatMPN1 concurrently
+	go func() {
+		defer wg.Done()
+		res, err := llm.ChatMPN1(messages)
+		resChan <- res
+		errChan <- err
+	}()
+
+	// Run llm.ChatMPN2 concurrently
+	go func() {
+		defer wg.Done()
+		res2, err2 := llm.ChatMPN2(messages)
+		resChan <- res2
+		errChan <- err2
+	}()
+
+	// Wait for both goroutines to finish
+	wg.Wait()
+	close(resChan)
+	close(errChan)
+
+	// Retrieve results and errors
+	var res, res2 string
+	var err, err2 error
+
+	for r := range resChan {
+		if res == "" {
+			res = r
+		} else {
+			res2 = r
+		}
+	}
+
+	for e := range errChan {
+		if err == nil {
+			err = e
+		} else {
+			err2 = e
+		}
+	}
+
+	if err != nil {
+		log.Printf("Error when getting review from LLM for MPN1 file : %v", err)
+	}
+
+	if err2 != nil {
+		log.Printf("Error when getting review from LLM for MPN2 file : %v", err2)
+	}
+	_ = res2
+
+	// log.Println("")
+	// log.Printf("Response1 : %s\n", res)
+
+	// log.Println("")
+
+	return res, err
 }
 
 func convertMDtoPDF(mdfile string, pdfile string) {
