@@ -160,7 +160,7 @@ IF you the script is good, you can skip it, put #NA only for response
 		}()
 	}
 
-	convertMDtoPDF(mdfilename, "code_review.pdf")
+	// convertMDtoPDF(mdfilename, "code_review.pdf")
 	convertMDtoHTML(mdfilename, "code_review.html")
 
 }
