@@ -142,7 +142,8 @@ IF you the script is good, you can skip it, put #NA only for response
 
 			messages = append(messages, openai.UserMessage(stringContent))
 			tempresult := "##" + strconv.Itoa(index+1) + " File: " + path
-			res, err := runChat(messages)
+			// res, err := runChat(messages)
+			res, err := llm.ChatMPN1(messages)
 			if err != nil {
 				log.Printf("Error while running chat concurent %v", err)
 			}
